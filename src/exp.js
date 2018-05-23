@@ -10,19 +10,31 @@
 // 	}
 // }, false)
 
+// string => DOM
+const createDOMFromStr = (domStr) => {
+	const div = document.createElement('div')
+    div.innerHTML = domStr
+    return div
+}
+
+
 class LikeButton {
     render() {
-      return `
-        <button class='like-btn'>
-        	<span class='like-text'>点赞</span>
-        </button>
-      `
+		this.el = createDOMFromStr(
+			`
+				<button class='like-btn'>
+					<span class='like-text'>点赞</span>
+				</button>
+			`
+		)
+		this.el.addEventListener('click', () => console.log('click'), false)
+		return this.el
     }
 }
 
 const wrapper = document.querySelector('.wrapper')
 const likeButton1 = new LikeButton()
-wrapper.innerHTML = likeButton1.render()
+wrapper.appendChild(likeButton1.render())
 
 const likeButton2 = new LikeButton()
-wrapper.innerHTML += likeButton2.render()
+wrapper.appendChild(likeButton2.render())
