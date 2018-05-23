@@ -19,6 +19,22 @@ const createDOMFromStr = (domStr) => {
 
 
 class LikeButton {
+	constructor() {
+		this.state = {
+			isLiked: false
+		}
+	}
+	changeLikeText () {
+		const likeText = this.el.querySelector('.like-text')
+		this.state.isLiked = !this.state.isLiked
+		const {isLiked} = this.state
+		if (isLiked) {
+		  likeText.innerHTML = '取消'
+		} else {
+		  likeText.innerHTML = '点赞'
+		}
+	}
+
     render() {
 		this.el = createDOMFromStr(
 			`
@@ -27,7 +43,9 @@ class LikeButton {
 				</button>
 			`
 		)
-		this.el.addEventListener('click', () => console.log('click'), false)
+		this.el.addEventListener('click', () => {
+			this.changeLikeText()
+		})
 		return this.el
     }
 }
