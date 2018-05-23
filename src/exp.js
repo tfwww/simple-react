@@ -1,58 +1,62 @@
-// const button = document.querySelector('.like-btn')
-// const buttonText = button.querySelector('.like-text')
-// let isLiked = false
-// button.addEventListener('click', function () {
-// 	isLiked = !isLiked
-// 	if (isLiked) {
-// 		buttonText.innerHTML = '取消'
-// 	} else {
-// 		buttonText.innerHTML = '点赞'
-// 	}
-// }, false)
-
 // string => DOM
-const createDOMFromStr = (domStr) => {
+const createDOMFromString = (domStr) => {
 	const div = document.createElement('div')
     div.innerHTML = domStr
     return div
 }
 
-
-class LikeButton {
-	constructor() {
-		this.state = {
-			isLiked: false
-		}
+const mount = (wrapper, component) => {
+	wrapper.appendChild(component.renderDOM())
+	component.onStateChange = (oldEl, newEl) => {
+		wrapper.insertBefore(newEl, oldEl)
+		wrapper.removeChild(oldEl)
 	}
-	changeLikeText () {
-		const likeText = this.el.querySelector('.like-text')
-		this.state.isLiked = !this.state.isLiked
-		const {isLiked} = this.state
-		if (isLiked) {
-		  likeText.innerHTML = '取消'
-		} else {
-		  likeText.innerHTML = '点赞'
-		}
+}
+
+class Component {
+	constructor(props = {}) {
+		this.props = props
 	}
 
-    render() {
-		this.el = createDOMFromStr(
-			`
-				<button class='like-btn'>
-					<span class='like-text'>点赞</span>
-				</button>
-			`
-		)
-		this.el.addEventListener('click', () => {
-			this.changeLikeText()
-		})
+	setState(state) {
+		const oldEl = this.el
+		this.state = state
+		this.el = this.renderDOM()
+		if (this.onStateChange) {
+			this.onStateChange(oldEl, this.el)
+		}
+	}
+
+	renderDOM() {
+		this.el = createDOMFromString(this.render())
+		if (this.onClick) {
+			this.el.addEventListener('click', this.onClick.bind(this), false)
+		}
 		return this.el
-    }
+	}
+}
+
+class LikeButton extends Component {
+	constructor(props) {
+		super(props)
+		this.state = { isLiked: false }
+	}
+
+	onClick() {
+		this.setState({
+			isLiked: !this.state.isLiked
+		})
+	}
+
+	render() {
+		return `
+			<button class='like-btn'>
+			<span class='like-text'>${this.state.isLiked ? '取消' : '点赞'}</span>
+			<span>?</span>
+			</button>
+		`
+	}
 }
 
 const wrapper = document.querySelector('.wrapper')
-const likeButton1 = new LikeButton()
-wrapper.appendChild(likeButton1.render())
-
-const likeButton2 = new LikeButton()
-wrapper.appendChild(likeButton2.render())
+mount(wrapper, new LikeButton())
